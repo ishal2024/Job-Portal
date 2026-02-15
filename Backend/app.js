@@ -17,7 +17,7 @@ app.use(express.urlencoded({extended : true}))
 app.use(parser())
 
 app.use(cors({
-    origin : "http://localhost:5173",
+    origin : "https://job-hunt-test.vercel.app",
     credentials : true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"]

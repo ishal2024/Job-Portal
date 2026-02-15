@@ -19,7 +19,8 @@ export async function loginUserController(req, res) {
 
         const token = generateToken(user?._id)
         res.cookie("token", token, {httpOnly: true,         
-            secure: true,                  
+            secure: false,
+            sameSite: "None",         
             maxAge: 7 * 24 * 60 * 60 * 1000})
         user.password = undefined
 
