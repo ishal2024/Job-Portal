@@ -7,8 +7,8 @@ async function applicantDashboard(req,res){
         // if(applications.length == 0)
         //     return res.status(200).json({status : true , data : applications , message : "All Applied Jobs of Applicant"})
 
-        const shortlistedJobs = 0
-        const rejectedJobs = 0
+        let shortlistedJobs = 0
+        let rejectedJobs = 0
 
         applications.map((jobs) => {
             if(jobs.status == "Rejected")
