@@ -4,12 +4,14 @@ import { searchJobs } from '../../axios/jobsApi'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import JobCard from '../Constants/JobCard'
 import LeftSection from './LeftSection'
+import HomePageSkeleton from '../Constants/HomePageSkeleton'
 
 function SearchPage() {
 
     const [currentPageNumber, setCurrentPageNumber] = useState(1)
     const [searchData, setSearchData] = useState({ data: [], totalPages: 1 })
     const [searchParams] = useSearchParams()
+    const [isSkeletonLoading, setSkeletonLoading] = useState(true)
     const navigate = useNavigate()
 
     // if(searchParams.get('query').length == 0 || !searchParams.has('query')){
@@ -35,30 +37,46 @@ function SearchPage() {
 
     async function handleSearchData() {
         try {
+            setSkeletonLoading(true)
             if (!searchParams.has("query") || searchParams.get("query").length == 0) return
             const query = searchParams.get("query")
             const res = await searchJobs(query, currentPageNumber, 1)
-            if(res?.data?.status) {
-               setSearchData({data : res?.data?.data , totalPages : res?.data?.totalPages})  
+            if (res?.data?.status) {
+                setSearchData({ data: res?.data?.data, totalPages: res?.data?.totalPages })
+                setSkeletonLoading(false)
             }
         } catch (error) {
             console.log(error?.message)
+            setSkeletonLoading(false)
         }
     }
 
     useEffect(() => {
-         handleSearchData()
-    },[currentPageNumber , searchParams])
+        handleSearchData()
+    }, [currentPageNumber, searchParams])
 
     return (
         <>
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="flex flex-col lg:flex-row gap-8">
                     <LeftSection />
+                    {
+                        isSkeletonLoading?
+                            <HomePageSkeleton />
+            :
                     <section className="flex-1 w-full">
+                        <nav className="  sticky top-0 z-40">
+                            <div className="max-w-7xl mx-auto flex items-center mb-2">
+                                <button
+                                    onClick={() => navigate(-1)}
+                                    className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors font-medium">
+                                    <ChevronLeft className="w-4 h-4" /> Back to Home
+                                </button>
+                            </div>
+                        </nav>
                         <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
                             <div>
-                                <h1 className="text-3xl font-bold text-slate-900">Recommended Jobs</h1>
+                                <h1 className="text-3xl font-bold text-slate-900">{searchParams.get("query")} Jobs</h1>
                                 <p className="text-slate-500 mt-1">Found {searchData?.data?.length} open positions.</p>
                             </div>
                         </div>
@@ -88,13 +106,13 @@ function SearchPage() {
                                 </button>
                             ))}
 
-                            <button 
+                            <button
 
-                            className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-500 hover:text-indigo-600 transition-colors">
+                                className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-500 hover:text-indigo-600 transition-colors">
                                 <ChevronRight className="w-5 h-5" />
                             </button>
                         </div>
-                    </section>
+                    </section>}
                 </div>
             </main>
         </>

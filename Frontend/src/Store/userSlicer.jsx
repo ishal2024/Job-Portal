@@ -15,8 +15,9 @@ const userSlicer = createSlice({
             state.userData = action.payload?.user
             state.status = true
         },
-        removeUserData : (state , action) => {
+        removeUserData : (state ) => {
             state.userData = null
+            state.userDashboardData = []
             state.status = false
         },
 

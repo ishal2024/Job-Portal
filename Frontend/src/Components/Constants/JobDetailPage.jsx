@@ -11,12 +11,14 @@ import {
     Monitor,
     Globe,
     Zap,
-    ChevronLeft
+    ChevronLeft,
+    Info
 } from 'lucide-react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { fetchSpecificJob } from '../../axios/jobsApi';
 import { createApplication } from '../../axios/applicationApi';
 import { RotatingLines } from 'react-loader-spinner';
+import JobDetailPageSkeleton from './JobDetailPageSkeleton';
 
 const JobDetailPage = () => {
 
@@ -25,6 +27,7 @@ const JobDetailPage = () => {
     const [jobData, setJobData] = useState({})
     const [alreadyApplied, setAlreadyApplied] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const [isSkeletonLoading , setSkeletonLoading] = useState(false)
 
     // const jobData = location?.state?.jobData
 
@@ -32,12 +35,15 @@ const JobDetailPage = () => {
 
     async function fetchJobData() {
         try {
+            setSkeletonLoading(true)
             const res = await fetchSpecificJob(jobId)
             if (res?.data?.status) {
                 setJobData(res?.data?.data?.job)
                 setAlreadyApplied(res?.data?.data?.alreadyApplied)
+                setSkeletonLoading(false)
             }
         } catch (error) {
+            setSkeletonLoading(false)
             console.log(error?.message)
         }
     }
@@ -62,7 +68,11 @@ const JobDetailPage = () => {
 
 
     return (
-        <div className="min-h-screen md:w-[70%] m-auto bg-slate-50 font-sans text-slate-800 pb-12">
+        <>
+        {isSkeletonLoading ? 
+            <JobDetailPageSkeleton />
+            :
+            <div className="min-h-screen md:w-[70%] m-auto bg-slate-50 font-sans text-slate-800 pb-12">
 
             {/* --- Navigation / Breadcrumb (Visual Context) --- */}
             <nav className="  sticky top-0 z-40">
@@ -109,12 +119,12 @@ const JobDetailPage = () => {
 
                         {/* Right: Action */}
                         <div className="w-full md:w-auto flex flex-col sm:flex-row gap-3">
-                            <button
+                            {jobData?.status ? <button
                                 disabled={alreadyApplied}
                                 onClick={handleApplyNow}
                                 className={`flex justify-center items-center w-full md:w-auto ${alreadyApplied ? 'bg-indigo-400 hover:bg-indigo-100' : 'bg-indigo-600 hover:bg-indigo-700'}  text-white font-bold px-8 py-3.5 rounded-xl shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2`}>
                                 {alreadyApplied ? "Already Applied" :
-                                <>
+                                    <>
                                         {isLoading ?
                                             <RotatingLines
                                                 visible={true}
@@ -129,16 +139,27 @@ const JobDetailPage = () => {
                                             />
                                             :
                                             <>
-                                            Apply Now
-                                        <ArrowRight className="w-5 h-5" />
-                                        </>
+                                                Apply Now
+                                                <ArrowRight className="w-5 h-5" />
+                                            </>
                                         }
                                     </>
                                 }
+                            </button> : 
+                            <button
+                                className={`flex cursor-not-allowed justify-center items-center w-full md:w-auto bg-indigo-300 hover:bg-indigo-400  text-white font-bold px-8 py-3.5 rounded-xl shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2`}>
+                                Closed
                             </button>
+                            }
                         </div>
                     </div>
                 </div>
+
+                {!jobData?.status && <div className="mb-8 w-full flex items-center gap-2 bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded-md text-sm font-medium">
+                    <Info size={16} className="text-red-600" />
+                    <span>Job is closed due to number of applicants</span>
+                </div>}
+
 
                 {/* --- Main Content Layout --- */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -268,7 +289,8 @@ const JobDetailPage = () => {
 
                 </div>
             </main>
-        </div>
+        </div>}
+        </>
     );
 };
 

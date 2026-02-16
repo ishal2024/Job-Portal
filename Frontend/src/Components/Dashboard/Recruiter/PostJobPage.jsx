@@ -29,7 +29,7 @@ const PostJobPage = ({ updateJobData , onClose }) => {
   const [position , setPosition] = useState(updateJobData ? updateJobData?.position : "")
   const [location , setLocation] = useState(updateJobData ? updateJobData?.location : "")
   const [company , setCompany] = useState(updateJobData ? updateJobData?.company : "")
-  const [jobType , setJobType] = useState(updateJobData ? updateJobData?.jobType : "")
+  const [jobType , setJobType] = useState(updateJobData ? updateJobData?.jobType : "Full-Time")
   const [salary , setSalary] = useState(updateJobData ? updateJobData?.salary : "")
   const [description , setDescription] = useState(updateJobData ? updateJobData?.description : "")
   const [skills , setSkills] = useState(updateJobData ? updateJobData?.skills : "")

@@ -4,6 +4,7 @@ import { fetchHomeJobs } from '../../axios/jobsApi';
 import { useDispatch, useSelector } from 'react-redux'
 import { addCurrentPage, addHomeJobs } from '../../Store/homeSlicer';
 import JobCard from '../Constants/JobCard';
+import HomePageSkeleton from '../Constants/HomePageSkeleton';
 
 // const JOBS = [
 //   {
@@ -72,19 +73,25 @@ function RightSection() {
 
   const dispatch = useDispatch()
   const { homeJobsData , totalPages , currPage } = useSelector((state) => state?.home)
+  const [isSkeletonLoading , setSkeletonLoading] = useState(false)
 
   async function handleFetchHomeJobs(pageNum = 1) {
     try {
+      setSkeletonLoading(true)
       const prevPageNum = currPage
       dispatch(addCurrentPage(pageNum))
       const res = await fetchHomeJobs(pageNum, 1)
       if (res?.data?.status) {
         dispatch(addHomeJobs({data : res?.data?.data , totalPages : res?.data?.totalPages , currPage : res?.data?.page}))
         console.log("Home data fetching again ")
+        setSkeletonLoading(false)
       }
-      else
+      else{
         dispatch(addCurrentPage(prevPageNum))
+        setSkeletonLoading(false)
+      }
     } catch (error) {
+      setSkeletonLoading(false)
       console.log(error?.message)
     }
   }
@@ -117,7 +124,11 @@ function RightSection() {
   }, [])
 
   return (
-    <section className="flex-1 w-full">
+    <>
+{   isSkeletonLoading ?
+     <HomePageSkeleton />
+  :
+   <section className="flex-1 w-full">
       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Recommended Jobs</h1>
@@ -150,27 +161,12 @@ function RightSection() {
           </button>
         ))}
 
-
-
-        {/* <button className="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-indigo-600 font-medium transition-all">
-          2
-        </button>
-
-        <button className="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-indigo-600 font-medium transition-all">
-          3
-        </button>
-
-        <span className="px-2 text-slate-400">...</span>
-
-        <button className="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-indigo-600 font-medium transition-all">
-          8
-        </button> */}
-
         <button className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-500 hover:text-indigo-600 transition-colors">
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
-    </section>
+    </section>}
+    </>
   )
 }
 

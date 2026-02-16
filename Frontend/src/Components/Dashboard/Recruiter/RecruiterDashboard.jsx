@@ -107,7 +107,6 @@ const RecruiterHub = () => {
         {/* Navigation Items */}
         <nav className="space-y-2 flex-1">
           <NavItem id="jobs" icon={LayoutGrid} label="My Posted Jobs" />
-          <NavItem id="post" icon={Plus} label="Post New Job" />
         </nav>
       </aside>
 
@@ -242,7 +241,9 @@ const RecruiterHub = () => {
           )})}
 
           {/* Create New Job Empty State Card */}
-          <button className="border-2 border-dashed border-slate-200 rounded-2xl p-8 flex flex-col items-center justify-center gap-4 text-slate-400 hover:border-blue-400 hover:bg-blue-50/30 hover:text-blue-600 transition-all duration-300 min-h-[240px] group cursor-pointer">
+          <button 
+          onClick={() => setPostJobPage(true)}
+          className="border-2 border-dashed border-slate-200 rounded-2xl p-8 flex flex-col items-center justify-center gap-4 text-slate-400 hover:border-blue-400 hover:bg-blue-50/30 hover:text-blue-600 transition-all duration-300 min-h-[240px] group cursor-pointer">
             <div className="w-16 h-16 rounded-full bg-slate-50 group-hover:bg-blue-100 flex items-center justify-center transition-colors shadow-sm">
               <Plus size={32} />
             </div>
