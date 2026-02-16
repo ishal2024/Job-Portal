@@ -19,8 +19,8 @@ app.use(parser())
 app.use(cors({
     origin : "https://job-hunt-test.vercel.app",
     credentials : true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    // methods: ["GET", "POST", "PUT", "DELETE"],
+    // allowedHeaders: ["Content-Type", "Authorization"]
 }))
 
 // Route Middleware Creation

@@ -22,8 +22,9 @@ export async function registerUserController(req,res) {
 
         const token = generateToken(createdUser?._id)
         res.cookie("token", token, {
-            httpOnly: true,         
-            secure: true,                  
+            httpOnly: true,
+             secure: true,
+            sameSite: "None",                          
             maxAge: 7 * 24 * 60 * 60 * 1000})
 
         return res.status(200).json({status : true , data : createdUser , message : "User is created Successfully"})
