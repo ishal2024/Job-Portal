@@ -121,15 +121,21 @@ function Header() {
                 {/* Mobile Nav Dropdown */}
                 {isMobileMenuOpen && (
                     <div className="md:hidden bg-white border-t border-slate-100 p-4 space-y-4 shadow-lg absolute w-full">
-                        <a href="#" className="block text-slate-600 font-medium">Find Jobs</a>
-                        <a href="#" className="block text-slate-600 font-medium">Dashboard</a>
+                        <NavLink to="/" className="block text-slate-600 font-medium">Find Jobs</NavLink>
+                        {status && <NavLink to="/dashboard" className="block text-slate-600 font-medium">Dashboard</NavLink>}
                         <hr className="border-slate-100" />
                        {status ?
-                       <button className="block w-full bg-red-600 text-white px-5 py-2 rounded-lg font-medium">Log Out</button>
+                       <button 
+                       onClick={handleLogOut}
+                       className="block w-full bg-red-600 text-white px-5 py-2 rounded-lg font-medium">Log Out</button>
                        : 
                        <>
-                        <button className="block w-full bg-indigo-600 text-white px-5 py-2 rounded-lg font-medium">Sign In</button>
-                        <button className="block w-full bg-indigo-600 text-white px-5 py-2 rounded-lg font-medium">Sign Up</button>
+                        <button 
+                        onClick={() => navigate('/signin')}
+                        className="block w-full bg-indigo-600 text-white px-5 py-2 rounded-lg font-medium">Sign In</button>
+                        <button 
+                        onClick={() => navigate('/signup')}
+                        className="block w-full bg-indigo-600 text-white px-5 py-2 rounded-lg font-medium">Sign Up</button>
                         </>
                        }
                     </div>

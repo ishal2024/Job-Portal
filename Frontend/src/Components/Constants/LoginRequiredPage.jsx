@@ -54,7 +54,7 @@ const LoginRequiredPage = () => {
 
         {/* Footer Link */}
         <div className="mt-8 pt-6 border-t border-slate-50">
-          <button onClick={() => navigate('/')} href="#" className="text-sm font-medium text-slate-400 hover:text-indigo-600 transition-colors">
+          <button onClick={() => navigate(-1)} href="#" className="text-sm font-medium text-slate-400 hover:text-indigo-600 transition-colors">
             Return to Home Page
           </button>
         </div>

@@ -15,9 +15,11 @@ import {
   Bookmark
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const ApplicantDashboard = () => {
 const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+const navigate = useNavigate()
 
 const {userDashboardData} = useSelector((state) => state.user)
 
@@ -72,32 +74,15 @@ const {userDashboardData} = useSelector((state) => state.user)
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           <p className="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 mt-2">Menu</p>
           
-          <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-indigo-50 text-indigo-700 font-medium transition-all shadow-sm shadow-indigo-100">
+          <p className="flex items-center gap-3 px-4 py-3 rounded-xl bg-indigo-50 text-indigo-700 font-medium transition-all shadow-sm shadow-indigo-100">
             <LayoutDashboard className="w-5 h-5" />
             Applied Jobs
-          </a>
+          </p>
           
-          <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-medium hover:bg-slate-50 hover:text-indigo-600 transition-colors group">
-            <User className="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors" />
-            My Profile
-          </a>
+          
 
-          <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-medium hover:bg-slate-50 hover:text-indigo-600 transition-colors group">
-            <Bookmark className="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors" />
-            Saved Jobs
-          </a>
-
-          <div className="mt-8">
-            <p className="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Settings</p>
-            <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-medium hover:bg-slate-50 hover:text-indigo-600 transition-colors group">
-              <Settings className="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors" />
-              Account Settings
-            </a>
-            <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-medium hover:bg-red-50 hover:text-red-600 transition-colors group">
-              <LogOut className="w-5 h-5 text-slate-400 group-hover:text-red-600 transition-colors" />
-              Sign Out
-            </a>
-          </div>
+          
+          
         </nav>
 
         {/* Bottom Upgrade Card */}
@@ -142,6 +127,28 @@ const {userDashboardData} = useSelector((state) => state.user)
 
         <div className="p-6 sm:p-8 max-w-7xl mx-auto space-y-8 animate-fade-in">
 
+
+          {/* --- 4. Stats Cards Section (Below Table) --- */}
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {stats?.map((stat, index) => (
+              <div 
+                key={index} 
+                className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div className={`p-3 rounded-xl ${stat.bg} group-hover:scale-110 transition-transform duration-300`}>
+                    {stat.icon}
+                  </div>
+                  <TrendingUp className="w-4 h-4 text-slate-300 group-hover:text-indigo-400 transition-colors" />
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold text-slate-900 mb-1">{stat.value}</h3>
+                  <p className="text-slate-500 font-medium text-sm">{stat.label}</p>
+                </div>
+              </div>
+            ))}
+          </section>
+
           {/* --- 3. Applications Table Card --- */}
           <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="px-6 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/30">
@@ -183,7 +190,9 @@ const {userDashboardData} = useSelector((state) => state.user)
                         {getStatusBadge(job?.status)}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button className="text-slate-400 hover:text-indigo-600 p-1 hover:bg-indigo-50 rounded transition-all">
+                        <button 
+                        onClick={() => navigate(`/job/${job?.jobId?._id}`)}
+                        className="text-slate-400 hover:text-indigo-600 p-1 hover:bg-indigo-50 rounded transition-all">
                           View Details
                         </button>
                       </td>
@@ -193,33 +202,15 @@ const {userDashboardData} = useSelector((state) => state.user)
               </table>
             </div>
             
-            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/30 text-center">
+            {/* <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/30 text-center">
               <button className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">
                 View All Applications
               </button>
-            </div>
+            </div> */}
           </section>
 
-          {/* --- 4. Stats Cards Section (Below Table) --- */}
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {stats?.map((stat, index) => (
-              <div 
-                key={index} 
-                className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group"
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div className={`p-3 rounded-xl ${stat.bg} group-hover:scale-110 transition-transform duration-300`}>
-                    {stat.icon}
-                  </div>
-                  <TrendingUp className="w-4 h-4 text-slate-300 group-hover:text-indigo-400 transition-colors" />
-                </div>
-                <div>
-                  <h3 className="text-3xl font-bold text-slate-900 mb-1">{stat.value}</h3>
-                  <p className="text-slate-500 font-medium text-sm">{stat.label}</p>
-                </div>
-              </div>
-            ))}
-          </section>
+          
+          
 
         </div>
       </main>
