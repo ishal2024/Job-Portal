@@ -72,29 +72,9 @@ import HomePageSkeleton from '../Constants/HomePageSkeleton';
 function RightSection() {
 
   const dispatch = useDispatch()
-  const { homeJobsData , totalPages , currPage } = useSelector((state) => state?.home)
-  const [isSkeletonLoading , setSkeletonLoading] = useState(false)
-
-  async function handleFetchHomeJobs(pageNum = 1) {
-    try {
-      setSkeletonLoading(true)
-      const prevPageNum = currPage
-      dispatch(addCurrentPage(pageNum))
-      const res = await fetchHomeJobs(pageNum, 1)
-      if (res?.data?.status) {
-        dispatch(addHomeJobs({data : res?.data?.data , totalPages : res?.data?.totalPages , currPage : res?.data?.page}))
-        console.log("Home data fetching again ")
-        setSkeletonLoading(false)
-      }
-      else{
-        dispatch(addCurrentPage(prevPageNum))
-        setSkeletonLoading(false)
-      }
-    } catch (error) {
-      setSkeletonLoading(false)
-      console.log(error?.message)
-    }
-  }
+  const { homeJobsData, totalPages, currPage, isHomeJobsDataPresent } = useSelector((state) => state?.home)
+  const { jobType, freshness } = useSelector((state) => state?.filter)
+  const [isSkeletonLoading, setSkeletonLoading] = useState(false)
 
   function getPostAge(createdAt) {
     const now = new Date();
@@ -113,59 +93,96 @@ function RightSection() {
     return `${seconds}s ago`;
   }
 
-  function handleOnPageChange(pageNum){
-      handleFetchHomeJobs(pageNum)
+  async function handleFetchHomeJobs(pageNum = 1) {
+    try {
+      setSkeletonLoading(true)
+      const prevPageNum = currPage
+      dispatch(addCurrentPage(pageNum))
+      const res = await fetchHomeJobs(pageNum, 1, { jobType, freshness })
+      if (res?.data?.status) {
+        dispatch(addHomeJobs({ data: res?.data?.data, totalPages: res?.data?.totalPages, currPage: res?.data?.page }))
+        console.log("Home data fetching again ")
+        setSkeletonLoading(false)
+      }
+      else {
+        dispatch(addCurrentPage(prevPageNum))
+        setSkeletonLoading(false)
+      }
+    } catch (error) {
+      setSkeletonLoading(false)
+      console.log(error?.response?.data)
+    }
+  }
+
+
+  function handleOnPageChange(pageNum) {
+    if(pageNum < 1) return
+    if(pageNum > totalPages) return
+
+    dispatch(addCurrentPage(pageNum))
+    handleFetchHomeJobs(pageNum)
   }
 
 
   useEffect(() => {
-    if(homeJobsData.length == 0)
-    handleFetchHomeJobs()
-  }, [])
+    if (!isHomeJobsDataPresent)
+      handleFetchHomeJobs()
+  }, [isHomeJobsDataPresent])
 
   return (
     <>
-{   isSkeletonLoading ?
-     <HomePageSkeleton />
-  :
-   <section className="flex-1 w-full">
-      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Recommended Jobs</h1>
-          <p className="text-slate-500 mt-1">Found {homeJobsData?.length} open positions.</p>
-        </div>
-      </div>
+      {isSkeletonLoading ?
+        <HomePageSkeleton />
+        :
+        <section className="flex-1 w-full">
+          <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900">Recommended Jobs</h1>
+              <p className="text-slate-500 mt-1">Found {homeJobsData?.length} open positions.</p>
+            </div>
+          </div>
 
-      {/* --- GRID LAYOUT CHANGE --- */}
-      {/* sm: 1 col, md: 2 cols, lg: 3 cols */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {homeJobsData.map((job) => {
-          const postAge = getPostAge(job?.createdAt)
-          return (
-            <JobCard job={job} postAge={postAge} />
-          )
-        })}
-      </div>
+          {/* --- GRID LAYOUT CHANGE --- */}
+          {/* sm: 1 col, md: 2 cols, lg: 3 cols */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {homeJobsData.map((job) => {
+              const postAge = getPostAge(job?.createdAt)
+              return (
+                <JobCard job={job} postAge={postAge} />
+              )
+            })}
+          </div>
 
-      {/* --- PAGINATION --- */}
-      <div className="mt-12 flex items-center justify-center gap-2">
-        <button className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-500 hover:text-indigo-600 transition-colors disabled:opacity-50">
-          <ChevronLeft className="w-5 h-5" />
-        </button>
+          {/* --- PAGINATION --- */}
+          <div className="mt-12 flex items-center justify-center gap-4">
 
-        {Array.from({ length: totalPages }).map((_, i) => (
-          <button
-          onClick={() => handleOnPageChange(i+1)}
-          className={`${currPage == i+1 ? "bg-indigo-600" : "bg-gray-400"} w-10 h-10 flex items-center justify-center rounded-lg  text-white font-medium shadow-md transition-all`}>
-            {i + 1}
-          </button>
-        ))}
+            {/* Prev Button */}
+            <button 
+            onClick={() => {
+              handleOnPageChange(currPage - 1)
+            }}
+            className={`px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-500 hover:text-indigo-600 transition-colors disabled:opacity-50 flex items-center gap-2`}>
+              <ChevronLeft className="w-5 h-5" />
+              Prev
+            </button>
 
-        <button className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-500 hover:text-indigo-600 transition-colors">
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </div>
-    </section>}
+            {/* Page Indicator */}
+            <div className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium shadow-md">
+              {currPage} / {totalPages}
+            </div>
+
+            {/* Next Button */}
+            <button 
+            onClick={() => {
+              handleOnPageChange(currPage + 1)
+            }}
+            className="px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
+              Next
+              <ChevronRight className="w-5 h-5" />
+            </button>
+
+          </div>
+        </section>}
     </>
   )
 }

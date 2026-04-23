@@ -20,8 +20,8 @@ router.get('/applicants/:jobId' , isUserAuthorize , viewAllJobApplicants)
 
 router.get('/job/:jobId' , isUserAuthorize ,specificJobData)
 
-router.get('/search'  , searchJobs)
+router.post('/search'  , searchJobs)
 
-router.get('/home'  , jobsForHomePage)
+router.post('/home'  , jobsForHomePage)
 
 export default router

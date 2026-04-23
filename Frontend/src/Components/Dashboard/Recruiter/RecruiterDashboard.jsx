@@ -16,12 +16,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { deleteJobPost } from '../../../axios/jobsApi';
 import { addDashboardDetail } from '../../../Store/userSlicer';
 import { recruiterDashboard } from '../../../axios/dashboardApi';
+import DeleteConfirmationModal from '../../Constants/DeleteConfirmationModal';
 
 
 const RecruiterHub = () => {
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
+
+  const [deleteModalData , setDeleteModalData] = useState({status : false , data : {}})
 
   const [activeTab, setActiveTab] = useState('jobs');
   const [jobStatus, setJobStatus] = useState('active');
@@ -33,19 +36,6 @@ const RecruiterHub = () => {
   const { userDashboardData } = useSelector((state) => state?.user)
   console.log(userDashboardData)
 
-  async function handleDeleteJobPost(postId) {
-    try {
-      console.log(postId)
-      const res = await deleteJobPost(postId)
-      if (res?.data?.status) {
-        const dashboardData = await recruiterDashboard()
-        if (dashboardData?.data?.status)
-          dispatch(addDashboardDetail(dashboardData?.data?.data))
-      }
-    } catch (error) {
-      console.log(error?.message)
-    }
-  }
 
   function handleUpdateJobPost(data){
     console.log(data)
@@ -84,6 +74,10 @@ const RecruiterHub = () => {
 
       {postJobPage && <PostJobPage updateJobData = {updateJobData} onClose={() => setPostJobPage(false)} />}
 
+      {deleteModalData?.status && <DeleteConfirmationModal 
+      onClose={() => setDeleteModalData({status : false , data : {}})}
+      job={deleteModalData?.data}
+      />}
       
 
       {/* Sidebar Navigation */}
@@ -209,7 +203,7 @@ const RecruiterHub = () => {
                       <Edit2 size={18} />
                     </button>
                     <button
-                      onClick={() => handleDeleteJobPost(job?._id)}
+                      onClick={() => setDeleteModalData({status : true , data : job})}
                       className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Job">
                       <Trash2 size={18} />
                     </button>

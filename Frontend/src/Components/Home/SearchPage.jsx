@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import JobCard from '../Constants/JobCard'
 import LeftSection from './LeftSection'
 import HomePageSkeleton from '../Constants/HomePageSkeleton'
+import { useSelector } from 'react-redux'
 
 function SearchPage() {
 
@@ -13,6 +14,8 @@ function SearchPage() {
     const [searchParams] = useSearchParams()
     const [isSkeletonLoading, setSkeletonLoading] = useState(true)
     const navigate = useNavigate()
+
+    const { jobType, freshness } = useSelector((state) => state.filter)
 
     // if(searchParams.get('query').length == 0 || !searchParams.has('query')){
     //     navigate('/')
@@ -36,11 +39,13 @@ function SearchPage() {
     }
 
     async function handleSearchData() {
+        // if (currentPageNumber < 1) return
+        // if (currentPageNumber > searchData?.totalPages) return
         try {
             setSkeletonLoading(true)
             if (!searchParams.has("query") || searchParams.get("query").length == 0) return
             const query = searchParams.get("query")
-            const res = await searchJobs(query, currentPageNumber, 1)
+            const res = await searchJobs(query, currentPageNumber, 1, { jobType, freshness })
             if (res?.data?.status) {
                 setSearchData({ data: res?.data?.data, totalPages: res?.data?.totalPages })
                 setSkeletonLoading(false)
@@ -53,7 +58,9 @@ function SearchPage() {
 
     useEffect(() => {
         handleSearchData()
-    }, [currentPageNumber, searchParams])
+    }, [currentPageNumber, searchParams, jobType, freshness])
+
+    console.log(searchData)
 
     return (
         <>
@@ -61,58 +68,77 @@ function SearchPage() {
                 <div className="flex flex-col lg:flex-row gap-8">
                     <LeftSection />
                     {
-                        isSkeletonLoading?
+                        isSkeletonLoading ?
                             <HomePageSkeleton />
-            :
-                    <section className="flex-1 w-full">
-                        <nav className="  sticky top-0 z-40">
-                            <div className="max-w-7xl mx-auto flex items-center mb-2">
-                                <button
-                                    onClick={() => navigate(-1)}
-                                    className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors font-medium">
-                                    <ChevronLeft className="w-4 h-4" /> Back to Home
-                                </button>
-                            </div>
-                        </nav>
-                        <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-                            <div>
-                                <h1 className="text-3xl font-bold text-slate-900">{searchParams.get("query")} Jobs</h1>
-                                <p className="text-slate-500 mt-1">Found {searchData?.data?.length} open positions.</p>
-                            </div>
-                        </div>
+                            :
+                            <section className="flex-1 w-full">
+                                <nav className="  sticky top-0 z-40">
+                                    <div className="max-w-7xl mx-auto flex items-center mb-2">
+                                        <button
+                                            onClick={() => navigate(-1)}
+                                            className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors font-medium">
+                                            <ChevronLeft className="w-4 h-4" /> Back to Home
+                                        </button>
+                                    </div>
+                                </nav>
+                                <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+                                    <div>
+                                        <h1 className="text-3xl font-bold text-slate-900">{searchParams.get("query")} Jobs</h1>
+                                        <p className="text-slate-500 mt-1">Found {searchData?.data?.length} open positions.</p>
+                                    </div>
+                                </div>
 
-                        {/* --- GRID LAYOUT CHANGE --- */}
-                        {/* sm: 1 col, md: 2 cols, lg: 3 cols */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {searchData?.data?.map((job) => {
-                                const postAge = getPostAge(job?.createdAt)
-                                return (
-                                    <JobCard job={job} postAge={postAge} />
-                                )
-                            })}
-                        </div>
+                                {/* --- GRID LAYOUT CHANGE --- */}
+                                {/* sm: 1 col, md: 2 cols, lg: 3 cols */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {searchData?.data?.map((job) => {
+                                        const postAge = getPostAge(job?.createdAt)
+                                        return (
+                                            <JobCard job={job} postAge={postAge} />
+                                        )
+                                    })}
+                                </div>
 
-                        {/* --- PAGINATION --- */}
-                        <div className="mt-12 flex items-center justify-center gap-2">
-                            <button className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-500 hover:text-indigo-600 transition-colors disabled:opacity-50">
-                                <ChevronLeft className="w-5 h-5" />
-                            </button>
+                                {/* --- PAGINATION --- */}
+                                <div className="mt-12 flex items-center justify-center gap-4">
 
-                            {Array.from({ length: searchData?.totalPages }).map((_, i) => (
-                                <button
-                                    onClick={() => setCurrentPageNumber(i + 1)}
-                                    className={`${currentPageNumber == i + 1 ? "bg-indigo-600" : "bg-gray-400"} w-10 h-10 flex items-center justify-center rounded-lg  text-white font-medium shadow-md transition-all`}>
-                                    {i + 1}
-                                </button>
-                            ))}
+                                    {/* Prev Button */}
+                                    <button
+                                        onClick={() => {
+                                            setCurrentPageNumber((prev) => {
+                                                if (prev - 1 < 1)
+                                                    return prev
+                                                else
+                                                    return prev - 1
+                                            })
+                                        }}
+                                        className={`px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-500 hover:text-indigo-600 transition-colors disabled:opacity-50 flex items-center gap-2`}>
+                                        <ChevronLeft className="w-5 h-5" />
+                                        Prev
+                                    </button>
 
-                            <button
+                                    {/* Page Indicator */}
+                                    <div className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium shadow-md">
+                                        {currentPageNumber} / {searchData?.totalPages}
+                                    </div>
 
-                                className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-500 hover:text-indigo-600 transition-colors">
-                                <ChevronRight className="w-5 h-5" />
-                            </button>
-                        </div>
-                    </section>}
+                                    {/* Next Button */}
+                                    <button
+                                        onClick={() => {
+                                            setCurrentPageNumber((prev) => {
+                                                if (prev + 1 > searchData?.totalPages)
+                                                    return prev
+                                                else
+                                                    return prev + 1
+                                            })
+                                        }}
+                                        className="px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
+                                        Next
+                                        <ChevronRight className="w-5 h-5" />
+                                    </button>
+
+                                </div>
+                            </section>}
                 </div>
             </main>
         </>

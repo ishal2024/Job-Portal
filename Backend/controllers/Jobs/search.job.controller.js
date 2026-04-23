@@ -4,6 +4,7 @@ async function searchJobs(req, res) {
     try {
         console.log(req?.query)
         const { search, page, limit } = req?.query
+        const {jobType , freshness} = req?.body
         const pageNum = parseInt(page) || 1
         const limitNum = parseInt(limit) || 15
         const skip = (pageNum - 1) * limitNum
@@ -12,14 +13,20 @@ async function searchJobs(req, res) {
         if (!search)
             return res.status(400).json({ status: false, message: "Please enter serach data" })
 
+        let query = {
+            $text: { $search: search }
+        }
+
+        if(!jobType.includes("all")){
+            query.jobType = {$in : jobType}
+        }
+
         const jobs = await jobsModel.find(
-            { $text: { $search: search } },
+            query,
             { score: { $meta: "textScore" } }
         ).sort({ score: { $meta: "textScore" } }).skip(skip).limit(limitNum)
 
-        const totalJobs = await jobsModel.countDocuments({
-            $text: { $search: search }
-        })
+        const totalJobs = await jobsModel.countDocuments(query)
 
         return res.status(200).json({ status: true, 
             page : pageNum,

@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { RotatingLines } from 'react-loader-spinner';
 import { addDetail } from '../../Store/userSlicer';
+import ErrorDialog from '../Constants/ErrorDialog';
 
 const Signup = () => {
 
@@ -14,6 +15,8 @@ const Signup = () => {
   const [userType, setUserType] = useState('Applicant');
 
   const [isLoading, setIsLoading] = useState(false)
+  const [isErrorDialogOpen , setErrorDialogOpen] = useState(false)
+  const [errorMessage , setErrorMessage] = useState("")
 
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
@@ -42,12 +45,20 @@ const Signup = () => {
 
     } catch (error) {
       setIsLoading(false)
+      setErrorDialogOpen(true)
+      setErrorMessage(error?.response?.data?.message)
       console.log(error?.response?.data)
     }
   }
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans text-slate-800">
+
+      {isErrorDialogOpen && <ErrorDialog 
+      isOpen={isErrorDialogOpen} 
+      onClose={() => setErrorDialogOpen(false)} 
+      message = {errorMessage}
+      />}
 
       {/* --- Main Card --- */}
       <div className="bg-white w-full max-w-[440px] rounded-2xl shadow-xl p-8 md:p-10 border border-slate-100 relative overflow-hidden transition-all duration-300">

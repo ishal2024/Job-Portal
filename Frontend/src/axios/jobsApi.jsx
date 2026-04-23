@@ -12,12 +12,12 @@ export async function updateJobPost(data , jobId){
     return await api.post(`/jobs/update/${jobId}` , data , {withCredentials : true})
 }
 
-export async function fetchHomeJobs(pageNumber = 1 , limit = 15){
-    return await api.get(`/jobs/home?page=${pageNumber}&limit=${limit}` ,  {withCredentials : true})
+export async function fetchHomeJobs(pageNumber = 1 , limit = 15 , data){
+    return await api.post(`/jobs/home?page=${pageNumber}&limit=${limit}` , data , {withCredentials : true})
 }
 
-export async function searchJobs(query,pageNumber = 1 , limit = 15){
-    return await api.get(`/jobs/search?search=${query}&page=${pageNumber}&limit=${limit}` ,  {withCredentials : true})
+export async function searchJobs(query,pageNumber = 1 , limit = 15 , data){
+    return await api.post(`/jobs/search?search=${query}&page=${pageNumber}&limit=${limit}` ,data ,  {withCredentials : true})
 }
 
 export async function fetchSpecificJob(jobId){

@@ -14,7 +14,7 @@ async function createApplication(req, res) {
             apllicationsModel.findOne({
                 jobId: jobId,
                 userId: req?.user?._id
-            })
+            }).populate("jobId")
         ]);
 
 

@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 export const api = axios.create({
-    baseURL: "https://job-portal-11cs.onrender.com/api",
+    baseURL: "https://job-portal-production-c3b7.up.railway.app/api",
     withCredentials: true
 });
 

@@ -2,7 +2,8 @@ import apllicationsModel from "../../models/apllications.model.js";
 
 async function applicantDashboard(req,res){
     try {
-        const applications = await apllicationsModel.find({"userId" : req?.user?._id}).populate("jobId")
+        const applications = await apllicationsModel.find({"userId" : req?.user?._id})
+        .populate("jobId").sort({createdAt : -1})
 
         // if(applications.length == 0)
         //     return res.status(200).json({status : true , data : applications , message : "All Applied Jobs of Applicant"})
